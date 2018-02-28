@@ -1,0 +1,8 @@
+.word {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.word:hover {
+  background-color: #d35400; 
+}
