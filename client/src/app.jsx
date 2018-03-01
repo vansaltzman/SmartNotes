@@ -18,6 +18,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: 'Riley',
       nameInpt: '',
       docInpt: '',
       docName: '',
@@ -27,6 +28,7 @@ class App extends React.Component {
      }
      this.addDocument = this.addDocument.bind(this)
      this.handleChange = this.handleChange.bind(this)
+     this.getDocument = this.getDocument.bind(this)
   }
 
   // handleChange(e, expanded) {
@@ -48,14 +50,20 @@ class App extends React.Component {
     this.setState({notes: arr})
   }
 
+  getDocument(docName) {
+    axios.get('/document', {params: {username: this.state.username, docName}})
+      .then(results => this.setState({docName: docName, text: results.data}))
+  }
+
   addDocument() {
-    console.log(this.state.nameInpt, this.state.docInpt)
-    axios.post('/document', {docName: this.state.nameInpt, docBody: this.state.docInpt})
+    let docName = this.state.nameInpt
+
+    axios.post('/document', {username: this.state.username, docName, docBody: this.state.docInpt})
       .then((data) => {
-        console.log(data.data.docName, data.data.docBody)
-        this.setState({docName: data.data.docName, text: data.data.docBody})
+        this.getDocument(docName)
       })
   }
+
 
   render() { 
     // const { expanded } = this.state;

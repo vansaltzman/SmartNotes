@@ -7,13 +7,13 @@ const session = driver.session();
 function addUser(username) {
   var session = driver.session()
   return session
-  
+
   .run(
     `MERGE (u:User{name: "${username}"})`
   )
   .then(result => {
     session.close();
-    console.log(result)
+    console.log('add user')
     return result
   })
   .catch(err => {
@@ -42,7 +42,7 @@ function addDocument(username, docName, docBody) {
   )
   .then(result => {
     session.close();
-    console.log(result)
+    console.log('add Document')
     return result
   })
   .catch(err => {
@@ -62,7 +62,7 @@ function getDocument(username, docName) {
   )
   .then(result => {
     session.close();
-    console.log(result)
+    console.log('get Document')
     return result
   })
   .catch(err => {
@@ -71,10 +71,97 @@ function getDocument(username, docName) {
   });
 } 
 
+function getDocumentList(username) {
+  //Not currently using username
+  var session = driver.session()
+  return session
+  
+  .run(
+  `MATCH (u:User{name: 'Riley'})-[:OWNS]->(d:Document)
+  RETURN d.name`
+  )
+  .then(result => {
+    session.close();
+    console.log('get Doc List')
+    return result
+  })
+  .catch(err => {
+    session.close();
+    console.log(err)
+  });
+}
 
+function addNote(username, docName, word, note) {
+  var session = driver.session()
+  return session
+
+  .run(
+  `MATCH (u:User{name: '${username}'})-[:OWNS]->(d:Document{name: '${docName}'})
+  MATCH (w:Word{name: '${word}'})
+  WITH u, d, w
+  MERGE (u)-[r:NOTE{doc: d.name}]->(w)
+  WITH r
+  SET r.text = '${note}'`
+  )
+  .then(result => {
+    session.close();
+    console.log('add Note')
+    return result
+  })
+  .catch(err => {
+    session.close();
+    console.log(err)
+  });
+}
+
+function deleteNote(username, docName, word) {
+  var session = driver.session()
+  return session
+
+  .run(
+  `MATCH (u:User{name: '${username}'})-[:OWNS]->(d:Document{name: '${docName}'})
+  MATCH (w:Word{name: '${word}'})
+  WITH u, d, w
+  MERGE (u)-[r:NOTE{doc: d.name}]->(w)
+  WITH r
+  DELETE r`
+  )
+  .then(result => {
+    session.close();
+    console.log('delete Note')
+    return result
+  })
+  .catch(err => {
+    session.close();
+    console.log(err)
+  });
+}
+
+function getNotes(username, docName) {
+  var session = driver.session()
+  return session
+
+  .run(
+  `MATCH (u:User{name: '${username}'})-[r:NOTE{doc: '${docName}'}]->(w:Word)
+  RETURN w.name, r.doc, r.text`
+  )
+  .then(result => {
+    session.close();
+    console.log('get Notes')
+    return result
+  })
+  .catch(err => {
+    session.close();
+    console.log(err)
+  });
+}
 
 module.exports = {
   addUser,
   addDocument,
-  getDocument
+  getDocument,
+  getDocumentList,
+  addNote,
+  deleteNote,
+  getNotes
 }
