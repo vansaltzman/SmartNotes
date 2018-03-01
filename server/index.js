@@ -1,17 +1,14 @@
 const pos = require('pos');
 const express = require('express');
 const bodyParser = require('body-parser');
-const driver = require()
+const db = require('./db')
 
 const app = express()
 app.use(express.static(__dirname + '/../client/dist'));
 app.use(bodyParser.json())
 
 app.post('/document', (req, res) => {
-  var {docName, docBody} = req.body
-
-  console.log(req.body)
-  console.log(docName, docBody)
+  var {docName, docBody, username} = req.body
 
   var words = new pos.Lexer().lex(docBody);
   var taggedWords = new pos.Tagger().tag(words);
@@ -21,10 +18,11 @@ app.post('/document', (req, res) => {
     var word = taggedWord[0];
     var tag = taggedWord[1];
 
-    arr.push({word: word, tag: tag})
+    arr.push([word, tag])
   }
-
-  res.send({docName, docBody: arr})
+  console.log(arr)
+  db.addDocument(username, docName, arr)
+    .then(results => res.send(results))
 })
   //recieve document in body as obj with document name, document body and username
   //check if document exists for that user
@@ -32,7 +30,12 @@ app.post('/document', (req, res) => {
   //write to db passing through POS tagger
   //send back confirmation
 
-app.get('/document', (req, res) => {})
+app.get('/document', (req, res) => {
+  var {username, docName} = req.query
+
+  db.getDocument(username, docName)
+    .then(result => res.send(result))
+})
   //retrieve document by document name and username from db
   //send back document as array (or linkedlist?)
 
@@ -53,7 +56,12 @@ app.get('/documentsList', (req, res) => {})
   //else 
     //send back array of all document names, except the current one
 
-app.post('/user', (req, res) => {})
+app.post('/user', (req, res) => {
+ var {username} = req.body
+
+ db.addUser(username)
+ .then(result => res.send(result))
+})
   //recieve username
   //if user exists 
     //send back bad request
