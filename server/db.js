@@ -143,7 +143,7 @@ function getNotes(username, docName) {
 
   .run(
   `MATCH (u:User{name: '${username}'})-[r:NOTE{doc: '${docName}'}]->(w:Word)
-  RETURN w.name, r.doc, r.text`
+  RETURN w.name, w.pos, r.text, r.doc`
   )
   .then(result => {
     session.close();

@@ -1,7 +1,7 @@
 .word {
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-bottom: 3px;
+  margin-left: 3px;
+  margin-right: 3px;
+  margin-bottom: 5px;
 }
 
 .punct {
@@ -32,4 +32,13 @@
 .NNP:hover, .NNPS:hover  {
   color: 'white';
   background-color: #8f21c2;
+}
+
+.note {
+  margin-right: 30px
+}
+
+.paper {
+  margin-left: 30px;
+  padding: 15px
 }

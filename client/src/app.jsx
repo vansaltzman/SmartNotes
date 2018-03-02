@@ -15,6 +15,7 @@ import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import DocumentBody from './components/paper.jsx'
 import Tooltip from 'material-ui';
+import GridList from 'material-ui/GridList'
 
 class App extends React.Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class App extends React.Component {
       notes: [],
       addNote: false,
       newNote: '',
-      expanded: false
+      expanded: false,
      }
      this.addDocument = this.addDocument.bind(this)
      this.handleChange = this.handleChange.bind(this)
@@ -40,13 +41,6 @@ class App extends React.Component {
      this.postNote = this.postNote.bind(this)
      this.getNotes = this.getNotes.bind(this)
   }
-
-  // handleChange(e, expanded) {
-  //   console.log()
-  //   this.setState({
-  //     expanded: expanded ? expanded : false,
-  //   });
-  // };
 
   componentDidMount() {
     this.getDocumentList()
@@ -60,6 +54,13 @@ class App extends React.Component {
     });
   };
 
+  changePannel (expanded, panel) {
+    console.log(expanded, panel)
+    this.setState({
+      expanded: !expanded ? panel : false,
+    });
+  };
+
   changeDoc(e) {
     let value = e.target.value
     this.setState({
@@ -70,6 +71,10 @@ class App extends React.Component {
         .then(() => this.getNotes())
       } 
     );
+  }
+
+  editNote() {
+
   }
 
   addNote(word) {
@@ -124,7 +129,23 @@ class App extends React.Component {
       })
   }
 
-  render() { 
+  render() {
+    
+    const styles = {
+      root: {
+        flexGrow: 1,
+      },
+      flex: {
+        flex: 1,
+      },
+      textField: {
+        padding: '10px'
+      },
+      expanded: {
+        marginRight: '30px'
+      }
+    };
+    
     return ( 
       <div>
         <Reboot />
@@ -174,50 +195,57 @@ class App extends React.Component {
                 handleChange={this.changeDoc}
                 text={this.state.text}
                 addNote={this.addNote}
+                selected={this.state.expanded}
               />
             </Grid>
             <Grid item xs={4}>
-                  {this.state.addNote ? 
-                  <ExpansionPanel expanded={true} >
-                    <ExpansionPanelSummary 
-                      expandIcon={<Close onClick={()=> this.setState({addNote: false, newNote:''})}/>}
-                      style={{cursor: 'auto'}}
+                {this.state.addNote ? 
+                <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
+                  <ExpansionPanelSummary 
+                    expandIcon={<Close onClick={()=> this.setState({addNote: false, newNote:''})}/>}
+                    style={{cursor: 'auto'}}
+                  >
+                    <Typography component="h5" variant="title">{this.state.addNote.word}</Typography>
+                    {/* <Typography color="textSecondary">{'(Part of Speach)' + this.state.addNote.tag}</Typography> */}
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                  <TextField
+                    fullWidth={true}
+                    label="Note"
+                    id="multiline-static"
+                    multiline
+                    rowsMax="50"
+                    value={this.state.newNote}
+                    name="newNote"
+                    onChange={(e)=>this.handleChange(e)}
+                    margin="normal"
+                  />
+                  </ExpansionPanelDetails>
+                  <Button onClick={this.postNote} fullWidth={true} variant="raised" color="primary">Add</Button>
+                </ExpansionPanel> 
+                : <div></div>}
+                <GridList cols={1} component="div" cellHeight={(window.innerHeight * 0.75)}>
+                <div>
+                {this.state.notes.map(note => {
+                  return (
+                    <ExpansionPanel 
+                      expanded={this.state.expanded === note.word} 
+                      onChange={()=>this.changePannel((this.state.expanded === note.word), note.word)} 
+                      className={note.tag} style={{marginRight: '30px'}}
                     >
-                      <Typography component="h5" variant="title">{this.state.addNote.word}</Typography>
-                      {/* <Typography color="textSecondary">{'(Part of Speach)' + this.state.addNote.tag}</Typography> */}
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                    <TextField
-                      fullWidth={true}
-                      label="Note"
-                      id="multiline-static"
-                      multiline
-                      rowsMax="50"
-                      value={this.state.newNote}
-                      name="newNote"
-                      onChange={(e)=>this.handleChange(e)}
-                      // className={classes.textField}
-                      margin="normal"
-                    />
-                    </ExpansionPanelDetails>
-                    <Button onClick={this.postNote} fullWidth={true} variant="raised" color="primary" style={{float: 'right'}}>Add</Button>
-                  </ExpansionPanel> 
-                  : <div></div>}
-              {this.state.notes.map(note => {
-                return (
-                  <ExpansionPanel >
-                    <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-                      <Typography>{note.word}</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <Typography>
-                        {note.note}
-                      </Typography>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                )
-              })}
-              
+                      <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+                        <Typography component="h5" variant="title">{note.word}</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <Typography onClick={()=> this.editNote(note.word, note.note)}>
+                          {note.note}
+                        </Typography>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  )
+                })}
+                </div>
+                </GridList>
             </Grid>
           </Grid>
       </div>
