@@ -15,12 +15,14 @@ app.post('/document', (req, res) => {
   var arr = [];
   for (i in taggedWords) {
     var taggedWord = taggedWords[i];
-    var word = taggedWord[0];
+    var word = taggedWord[0].replace('-', '')
     var tag = taggedWord[1];
+
+    if (word === ';') console.log(word, tag)
 
     arr.push([word, tag])
   }
-  
+
   db.addDocument(username, docName, arr)
     .then(results => res.send(results))
 })
@@ -36,9 +38,10 @@ app.get('/document', (req, res) => {
 })
 
 app.post('/note', (req, res) => {
+  console.log(req.body)
   var {username, docName, word, note} = req.body
 
-  db.addNote(username, docName, word, note)
+  db.addNote(username, docName, word.word, note)
     .then(result => res.send(result))
 })
 
@@ -46,7 +49,7 @@ app.get('/notes', (req, res) => {
   var {username, docName} = req.query
 
   db.getNotes(username, docName)
-    .then(result => res.send(result))
+    .then(result => res.send(result.records.map(item => ({word: item._fields[0], note: item._fields[2]}))))
 })
 
 app.get('/documentsList', (req, res) => {
@@ -54,7 +57,10 @@ app.get('/documentsList', (req, res) => {
   var {username} = req.query
   //send back array of all document names
   db.getDocumentList(username)
-    .then(result => res.send(result))
+    .then(result => {
+      let transformed = result.records.map(item => (item._fields[0]))
+      res.send(transformed)
+    })
 })
 
 app.post('/user', (req, res) => {

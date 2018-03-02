@@ -1,8 +1,35 @@
 .word {
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-bottom: 3px;
+}
+
+.punct {
+  margin-left: -3px;
+  padding-right: 3px;
+  padding-bottom: 3px;
 }
 
 .word:hover {
-  background-color: #d35400; 
+  background-color: #4258d1; 
+}
+
+
+.CC:hover, .IN:hover, .TO:hover, .DT:hover{
+  background-color: #adaaaa; 
+}
+
+.NN:hover, .NNS:hover, .POS:hover, .PP\$:hover 
+.PRP:hover, .WP:hover, .WP\$:hover {
+  background-color: #d6e22c; 
+}
+
+.VB:hover, .VBD:hover, .VBG:hover, .VBN:hover
+.VBP:hover, .VZ:hover {
+  background-color: #2cac36; 
+}
+
+.NNP:hover, .NNPS:hover  {
+  color: 'white';
+  background-color: #8f21c2;
 }
