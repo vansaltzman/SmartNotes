@@ -72,7 +72,8 @@ class App extends React.Component {
       showDocInput: false,
       tutorial: false,
       editNote: false,
-      editNoteInpt: ''
+      editNoteInpt: '',
+      showFilters: false,
      }
      this.addDocument = this.addDocument.bind(this)
      this.handleChange = this.handleChange.bind(this)
@@ -83,6 +84,7 @@ class App extends React.Component {
      this.getNotes = this.getNotes.bind(this)
      this.changePannel = this.changePannel.bind(this)
      this.showDocInput = this.showDocInput.bind(this)
+     this.toggleFilters = this.toggleFilters.bind(this)
   }
 
   componentDidMount() {
@@ -115,6 +117,11 @@ class App extends React.Component {
     })
   };
 
+  toggleFilters() {
+    console.log(this.state.showFilters)
+    this.setState({showFilters: !this.state.showFilters})
+  }
+
   showDocInput() {
     this.setState({showDocInput: !this.state.showDocInput})
   }
@@ -124,14 +131,16 @@ class App extends React.Component {
       this.showDocInput()
     } else {
       let value = e.target.value
-      this.setState({
-        docName: e.target.value,
-      }, 
-      ()=> {
-        this.getDocument(value)
-          .then(() => this.getNotes())
-        } 
-      );
+      this.setState({docName: e.target.value},
+      () => {
+        this.setState({docBodyHeight: document.getElementById('docBody').offsetHeight}, 
+        ()=> {
+          this.getDocument(value)
+            .then(() => this.getNotes())
+          } 
+        );
+      }
+    )
     }
   }
 
@@ -311,6 +320,8 @@ class App extends React.Component {
                 posColor={posColor}
                 showDocInput = {this.showDocInput}
                 changeDoc = {this.changeDoc}
+                toggleFilters = {this.toggleFilters}
+                showFilters = {this.state.showFilters}
               />
             </Grid>
             <Grid item xs={4}>
@@ -380,8 +391,8 @@ class App extends React.Component {
                             <Typography component="h5" variant="title">{note.word}</Typography>
                           </ExpansionPanelSummary>
                           <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-                            <PosIcon style={{color: posColor[note.tag] || '#4258d1'}}/>
-                            <Typography component="h5" variant="title">{note.word}</Typography>
+                            <PosIcon style={{color: posColor[note.tag] || '#4258d1', margin: '3px 10px 0 2px'}}/>
+                            <Typography component="h3" variant="title" style={{fontSize:"24px"}} >{note.word}</Typography>
                           </ExpansionPanelSummary>
                           <ExpansionPanelDetails>
                             {this.state.editNote === note.word ? 
@@ -396,6 +407,7 @@ class App extends React.Component {
                               value={this.state.editNoteInpt}
                               onChange={(e)=>this.handleChange(e)}
                               margin="normal"
+                              style={{marginLeft: '10px'}}
                               endAdornment={
                               <InputAdornment position="end">
                                 <IconButton
@@ -413,12 +425,22 @@ class App extends React.Component {
                               }
                             />
                             :
-                            <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="right-start">
-                              <Typography onDoubleClick={()=>this.setState({editNote: note.word, editNoteInpt: note.note})}>
-                                {note.note}
+                            <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top">
+                              <Typography 
+                                paragraph={true} 
+                                variant="subheading" 
+                                style={{ lineHeight: 'normal', whiteSpace: 'pre-line' ,margin: '3px 0 0 10px'}} 
+                                onDoubleClick={()=> {
+                                  console.log(JSON.stringify(note.note))
+                                  this.setState({editNote: note.word, editNoteInpt: note.note})}
+                                }>
+                                  {note.note}
                               </Typography>
                             </Tooltip>
                             }
+                            {/* <Typography variant="caption">
+                              This is where stats would go
+                            </Typography> */}
                           </ExpansionPanelDetails>
                         </ExpansionPanel>
                         </div>

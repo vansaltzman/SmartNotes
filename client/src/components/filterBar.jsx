@@ -3,8 +3,6 @@ import { withStyles } from 'material-ui/styles';
 import {yellow, green, purple, grey} from 'material-ui/colors';
 import { FormGroup, FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
-import IconButton from 'material-ui/IconButton'
-import Filter from 'material-ui-icons/FilterList';
 
 const styles = {
   Characters: {color: purple[500]},
@@ -17,7 +15,6 @@ class FilterBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      showBar: false, 
       Notes: false,
       Characters: true,
       Nouns: true,
@@ -34,15 +31,11 @@ class FilterBar extends React.Component {
 
   render() { 
 
-    const {classes} = this.props
+    const {classes, showFilters} = this.props
 
-    if (this.state.showBar) {
+    if (showFilters) {
       return ( 
-        <div>
-           <IconButton>
-            <Filter onClick={()=> this.setState({showBar: false})}/>
-          </IconButton>
-          
+        <div>      
           <FormGroup row>
           <FormControlLabel
               control={
@@ -123,9 +116,7 @@ class FilterBar extends React.Component {
        )
     } else {
       return (
-        <IconButton>
-          <Filter onClick={()=> this.setState({showBar: true})}/>
-        </IconButton>
+        <div></div>
       )
     }
   }

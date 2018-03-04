@@ -15,6 +15,7 @@ import Button from 'material-ui/Button'
 import {ListItem, ListItemText, ListItemIcon} from 'material-ui/List'
 import Divider from 'material-ui/Divider'
 import FilterBar from './filterBar.jsx'
+import Filter from 'material-ui-icons/FilterList';
 
 const styles = {
   root: {
@@ -36,16 +37,21 @@ const styles = {
 
 function DocumentBody(props) {
 
-  const { classes, username, docList, docName, handleChange, text, addNote, selected, posColor, showDocInput, changeDoc } = props;
+  const { 
+    classes, username, docList, 
+    docName, handleChange, text, 
+    addNote, selected, posColor, 
+    showDocInput, changeDoc, showFilters,
+    toggleFilters, 
+  } = props;
 
   if (docList.length > 0) {
     return ( 
       <div id='docBody'>
         <Paper className="paper" style={{marginBottom: '24px'}}>
-          <Typography variant="headline" component="h2" style={{overflow: 'auto', maxWidth: '300px'}}>
-            {console.log(docName.length, (24/(docName.length/21)))}
+          <Typography variant="headline" component="h2" style={{maxWidth: '300px'}}>
               <Select
-                style={{fontSize: Math.min((24/(docName.length/21)), 24) + 'px'}}
+                style={{fontSize: Math.min((24/(docName.length/21)), 28) + 'px'}} //To handle long titles
                 renderValue={()=> docName}
                 className={classes.select}
                 value={docName}
@@ -74,9 +80,12 @@ function DocumentBody(props) {
                   </ListItem>
 
               </Select>
+              <IconButton>
+                <Filter onClick={toggleFilters}/>
+              </IconButton>
           </Typography>
             <div style={{display: 'inline'}} >
-              <FilterBar filter={()=> console.log('tick')}/>
+              <FilterBar showFilters={showFilters} filter={()=> console.log('tick')}/>
             </div>
           </Paper>
   
