@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import ScrollTo from 'scroll-into-view-if-needed'
 import Reboot from 'material-ui/Reboot'
 // import AppBar from 'material-ui/AppBar'
 import AppBar from './components/appBar.jsx'
@@ -21,6 +22,7 @@ import Slide from 'material-ui/transitions/Slide'
 import Divider from 'material-ui/Divider'
 import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
 import IconButton from 'material-ui/IconButton'
+import { LinearProgress } from 'material-ui/Progress'
 
 const posColor = {
   CC: '#adaaaa',
@@ -105,8 +107,10 @@ class App extends React.Component {
       expanded: !expanded ? panel : false,
     }, () => {
       if (!expanded) {
-        let scroll = ()=> this[panel].scrollIntoView({block: 'start', behavior: 'smooth'})
-        setTimeout(scroll, 100)
+        // let scroll = ()=> this[panel].scrollIntoView({block: 'start', behavior: 'smooth'})
+        // setTimeout(scroll, 100)
+        let target = this[panel] || this._top
+        ScrollTo(target, {boundary:this.notesList, centerIfNeeded: true, easing: 'easeOut', duration: 200})
       }
     })
   };
@@ -132,7 +136,6 @@ class App extends React.Component {
   }
 
   editNote(wordObj) {
-    console.log(wordObj)
     axios.post('/note', {
       username: this.state.username,
       docName: this.state.docName,
@@ -154,15 +157,19 @@ class App extends React.Component {
     else if (!this.state.notes.find(note => note.word === word.word)) {
       this.setState({addNote: word, expanded: false, badNoteAttempt: false},  
       ()=> {
-        let scroll = () => this._top.scrollIntoView({block: 'start', behavior: 'smooth'})
-        setTimeout(scroll, 50)
+        // let scroll = () => this._top.scrollIntoView({block: 'start', behavior: 'smooth'})
+        // setTimeout(scroll, 50)
+        console.log(this[word.word])
+        ScrollTo(this._top, {boundary:this.notesList, centerIfNeeded: true, easing: 'easeOut', duration: 200})
       })
     } else {
       this.setState({expanded: word.word, addNote: false, badNoteAttempt: false}, 
       ()=> {
         if (this.hasOwnProperty(word.word)) {
-          let scroll = () => this[word.word].scrollIntoView({block: 'start', behavior: 'smooth'})
-          setTimeout(scroll, 200)
+          // let scroll = () => this[word.word].scrollIntoView({block: 'start', behavior: 'smooth'})
+          // setTimeout(scroll, 200)
+          console.log(this[word.word])
+          ScrollTo(this[word.word], {boundary:this.notesList, centerIfNeeded: true, easing: 'easeOut', duration: 200})
         }
       })
     }
@@ -213,14 +220,21 @@ class App extends React.Component {
 
   addDocument() {
     let docName = this.state.nameInpt
-
-    axios.post('/document', {username: this.state.username, docName, docBody: this.state.docInpt})
-      .then((data) => {
-        this.showDocInput()
-        this.getDocument(docName)
-        this.getDocumentList()
-        this.setState({tutorial: false})
-      })
+    this.setState({loading: true}, ()=> {
+      setTimeout(()=> {
+      axios.post('/document', {username: this.state.username, docName, docBody: this.state.docInpt})
+        .then((data) => {
+            this.getDocument(docName)
+            this.getDocumentList()
+            this.getNotes()
+            this.setState({tutorial: false})
+          })
+          .then(()=> {
+            this.showDocInput()
+            this.setState({loading: false})
+          })
+        }, 1000)
+    })
   }
 
   render() {
@@ -281,6 +295,7 @@ class App extends React.Component {
                   </Typography>
                   <Button style={{width: '49%'}} onClick={this.showDocInput} variant="raised" color="secondary">Cancel</Button>
                   <Button style={{width: '49%', float: 'right'}} disabled={this.state.docInpt === '' || this.state.nameInpt === ''} onClick={this.addDocument} variant="raised" color="primary">Add</Button>
+                  {this.state.loading && <LinearProgress style={{margin: '10px 0 10px 0'}} />}
                 </Paper>
               </div>
             </Slide>
@@ -345,15 +360,17 @@ class App extends React.Component {
                   style={{
                     height: this.state.addNote ? ((this.state.docBodyHeight) - 220) : (this.state.docBodyHeight)}} 
                   cols={1} 
-                  component="div" 
+                  component="div"
+                  ref={(list) => this.notesList = list}
                   cellHeight={(this.state.docBodyHeight)}>
                 <div>
                  <div style={{margin: '0 0 0 0', padding: '0 0 0 0'}} ref={(top) => this._top = top}></div>
-                  {this.state.notes.map(note => {
+                  {this.state.notes.map((note, i) => {
                     return (
-                      <div style={this.state.expanded === note.word ? {margin: '12px 0 12px 0'} : {margin: '1px 0 1px 0'}} ref={(word) => this[note.word] = word}>
+                      <div key={i} style={this.state.expanded === note.word ? {margin: '12px 0 12px 0'} : {margin: '1px 0 1px 0'}} ref={(word) => this[note.word] = word}>
                       <ExpansionPanel
                           expanded={this.state.expanded === note.word} 
+                          elevation={this.state.expanded === note.word ? 4 : 1}
                           onChange={(e)=>  this.changePannel((this.state.expanded === note.word), note.word)}
                           style={{marginRight: '30px'}}
                         >

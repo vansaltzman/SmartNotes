@@ -14,6 +14,7 @@ import AddDoc from 'material-ui-icons/NoteAdd';
 import Button from 'material-ui/Button'
 import {ListItem, ListItemText, ListItemIcon} from 'material-ui/List'
 import Divider from 'material-ui/Divider'
+import FilterBar from './filterBar.jsx'
 
 const styles = {
   root: {
@@ -36,12 +37,15 @@ const styles = {
 function DocumentBody(props) {
 
   const { classes, username, docList, docName, handleChange, text, addNote, selected, posColor, showDocInput, changeDoc } = props;
+
   if (docList.length > 0) {
     return ( 
       <div id='docBody'>
         <Paper className="paper" style={{marginBottom: '24px'}}>
-          <Typography variant="headline" component="h2">
+          <Typography variant="headline" component="h2" style={{overflow: 'auto', maxWidth: '300px'}}>
+            {console.log(docName.length, (24/(docName.length/21)))}
               <Select
+                style={{fontSize: Math.min((24/(docName.length/21)), 24) + 'px'}}
                 renderValue={()=> docName}
                 className={classes.select}
                 value={docName}
@@ -59,16 +63,21 @@ function DocumentBody(props) {
                     </Typography>
                   </MenuItem>
                   )})}
-                <ListItem onClick={showDocInput} value="_newDoc" button={true}>
-                  <ListItemIcon>
-                    <AddDoc />
-                  </ListItemIcon>
-                  <Typography variant="headline" component="h2">
-                    <ListItemText inset={false} disableTypography={true} primary="New Document" />
-                  </Typography>
-                </ListItem>
+
+                  <ListItem onClick={showDocInput} value="_newDoc" button={true}>
+                    <ListItemIcon>
+                      <AddDoc />
+                    </ListItemIcon>
+                    <Typography variant="headline" component="h2">
+                      <ListItemText inset={false} disableTypography={true} primary="New Document" />
+                    </Typography>
+                  </ListItem>
+
               </Select>
           </Typography>
+            <div style={{display: 'inline'}} >
+              <FilterBar filter={()=> console.log('tick')}/>
+            </div>
           </Paper>
   
           <Paper className="paper">
