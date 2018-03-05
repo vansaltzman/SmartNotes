@@ -25,7 +25,7 @@ const styles = {
 };
 
 function MyAppBar(props) {
-  const { classes, username, docList, docName, handleChange } = props;
+  const { classes, username, docList, docName, handleChange, handleUser } = props;
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -33,7 +33,7 @@ function MyAppBar(props) {
           <Typography variant="title" color="inherit" className={classes.flex}>
             Note Taker
           </Typography>
-          <Button color="inherit">{username}</Button>
+          {username && <Button onClick={()=>handleUser()} color="inherit">{username}</Button>}
         </Toolbar>
       </AppBar>
     </div>

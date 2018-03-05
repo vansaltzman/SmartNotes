@@ -11,7 +11,7 @@ import Grid from 'material-ui/Grid'
 import Toolbar from 'material-ui/Toolbar'
 import { withStyles } from 'material-ui/styles';
 import ExpansionPanel, {ExpansionPanelDetails,ExpansionPanelSummary} from 'material-ui/ExpansionPanel';
-import { Close, ExpandMore, Send, Edit } from 'material-ui-icons';
+import { PersonAdd, Close, ExpandMore, Send, Edit } from 'material-ui-icons';
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import DocumentBody from './components/paper.jsx'
@@ -23,6 +23,8 @@ import Divider from 'material-ui/Divider'
 import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
 import IconButton from 'material-ui/IconButton'
 import { LinearProgress } from 'material-ui/Progress'
+import { FormHelperText } from 'material-ui/Form';
+import List, { ListItem, ListItemSecondaryAction, ListItemIcon } from 'material-ui/List'
 
 const posColor = {
   CC: '#adaaaa',
@@ -56,13 +58,13 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: 'Riley',
+      username: false,
+      loginInpt: '',
       nameInpt: '',
       docInpt: '',
       docName: '',
       docList: [],
       text: [],
-      // expanded: null
       notes: [],
       addNote: false,
       newNote: '',
@@ -85,16 +87,41 @@ class App extends React.Component {
      this.changePannel = this.changePannel.bind(this)
      this.showDocInput = this.showDocInput.bind(this)
      this.toggleFilters = this.toggleFilters.bind(this)
+     this.handleUser = this.handleUser.bind(this)
   }
 
   componentDidMount() {
-    this.getDocumentList()
-      .then(()=> this.getDocument(this.state.docList[0]))
-      .then(()=> this.getNotes())
-      .then(()=> {
-        if (this.state.docList.length < 1) this.setState({showDocInput: true, tutorial: true})
-        else this.setState({docBodyHeight: document.getElementById('docBody').offsetHeight})
-      })
+    if (this.state.username) {
+      this.getDocumentList()
+        .then(()=> this.getDocument(this.state.docList[0]))
+        .then(()=> this.getNotes())
+        .then(()=> {
+          if (this.state.docList.length < 1) this.setState({showDocInput: true, tutorial: true})
+          else this.setState({docBodyHeight: document.getElementById('docBody').offsetHeight})
+          console.log(this.state.showDocInput, '<<<<')
+        })
+    }
+  }
+
+  handleUser(username) {
+    this.setState({username: username, loginInpt: ''}, ()=> {
+      console.log('getting stuff for ', this.state.username)
+      if (username) {
+        this.addUser()
+        .then(()=> this.getDocumentList())
+        .then(()=> this.getDocument(this.state.docList[0]))
+        .then(()=> this.getNotes())
+        .then(()=> {
+          if (this.state.docList.length < 1) this.setState({showDocInput: true, tutorial: true})
+          else this.setState({docBodyHeight: document.getElementById('docBody').offsetHeight, showDocInput: false, tutorial: false})
+          console.log(this.state.showDocInput, '<<<<')
+        })
+      }
+    })
+  }
+
+  addUser() {
+    return axios.post('/user', {username: this.state.username})
   }
 
   handleChange(e) {
@@ -213,7 +240,8 @@ class App extends React.Component {
   }
 
   getDocumentList() {
-    return axios.get('/documentsList')
+    console.log(this.state.username)
+    return axios.get('/documentsList', {params: {username: this.state.username}})
       .then(result => {
         this.setState({docList: result.data})
       })
@@ -242,6 +270,9 @@ class App extends React.Component {
             this.showDocInput()
             this.setState({loading: false})
           })
+          .catch(()=> {
+            this.setState({loading: false})
+          })
         }, 1000)
     })
   }
@@ -262,197 +293,249 @@ class App extends React.Component {
         marginRight: '30px'
       }
     };
-    
-    return ( 
-      <div>
+
+    if (this.state.username === '' || !this.state.username) {
+     return( 
+     <div>
         <Reboot />
           <AppBar 
-            username={this.state.username}
-            docList={this.state.docList}
-            docName={this.state.docName}
-            handleChange={this.handleChange}
+            username={false}
             style={{maxWidth: '100%'}}
+            handleUser={this.handleUser}
           />
-          <Grid container spacing={24}  style={{maxWidth: '100%' , marginTop: '16px'}}>
-            <Grid item xs={8}>
-            <Slide direction="down" in={this.state.showDocInput} mountOnEnter unmountOnExit>
-              <div style={{marginBottom: '48px'}}>
-                <Paper className="paper" style={{marginBottom: '24px'}}>
-                  <Typography variant="headline" component="h2">
-                  <TextField
-                    label="Title"
-                    fullWidth={true}
-                    id="text-field-controlled"
-                    name="nameInpt"
-                    value={this.state.nameInpt}
-                    onChange={(e)=>this.handleChange(e)}
-                  />
-                  </Typography>
-                  <Typography gutterBottom={true} align="left" variant="title" paragraph={true}>
+          <Paper style={{width: '400px', height: '300px', position: 'absolute', top :0, bottom: 0, left: 0, right: 0, margin: 'auto'}} className="paper">
+            <Grid container direction="column" spacing={24} justify="center" alignItems="center" style={{maxWidth: '100%' , marginTop: '16px'}}>
+              <Grid item xs={10}>
+              <Typography align="center" variant="title" style={{marginBottom: '20px', fontSize: '42px'}}>
+                Welcome!
+                <br />
+                Please Login
+              </Typography>
+              </Grid>
+              <Grid item xs={10}>
+              <Input
+                type={'text'}
+                autoFocus={true}
+                name="loginInpt"
+                value={this.state.loginInpt}
+                onChange={(e)=>this.handleChange(e)}
+                margin="normal"
+                endAdornment={
+                <InputAdornment position="end">
+                 { this.state.loginInpt.length > 3 ?
+                 <IconButton
+                    onClick={()=>this.handleUser(this.state.loginInpt)}
+                  >
+                    <PersonAdd />
+                  </IconButton>
+                  : <span style={{width: '48px'}}></span>
+                }
+                </InputAdornment>
+                }
+              />
+              {this.state.loginInpt.length < 4 && <FormHelperText>Username must be at least 4 characters</FormHelperText>}
+              </Grid>
+            </Grid>
+          </Paper>
+        </div>
+     )
+    } else {
+
+      return ( 
+        <div>
+          <Reboot />
+            <AppBar 
+              username={this.state.username}
+              docList={this.state.docList}
+              docName={this.state.docName}
+              handleChange={this.handleChange}
+              style={{maxWidth: '100%'}}
+              handleUser={this.handleUser}
+            />
+            <Grid container spacing={24}  style={{maxWidth: '100%' , marginTop: '16px'}}>
+              <Grid item xs={8}>
+              <Slide direction="down" in={this.state.showDocInput} mountOnEnter unmountOnExit>
+                <div style={{marginBottom: '48px'}}>
+                  <Paper className="paper" style={{marginBottom: '24px'}}>
+                    <Typography variant="headline" component="h2">
                     <TextField
-                      InputProps={{disableUnderline: true}}
-                      label="Document Body"
+                      label="Title"
                       fullWidth={true}
                       id="text-field-controlled"
-                      name="docInpt"
-                      multiline
-                      rows={15}
-                      rowsMax={15}
-                      value={this.state.docInpt}
+                      name="nameInpt"
+                      value={this.state.nameInpt}
                       onChange={(e)=>this.handleChange(e)}
                     />
-                  </Typography>
-                  <Button style={{width: '49%'}} onClick={this.showDocInput} variant="raised" color="secondary">Cancel</Button>
-                  <Button style={{width: '49%', float: 'right'}} disabled={this.state.docInpt === '' || this.state.nameInpt === ''} onClick={this.addDocument} variant="raised" color="primary">Add</Button>
-                  {this.state.loading && <LinearProgress style={{margin: '10px 0 10px 0'}} />}
-                </Paper>
-              </div>
-            </Slide>
-              <DocumentBody 
-                id="docBody"
-                username={this.state.username}
-                docList={this.state.docList}
-                docName={this.state.docName}
-                handleChange={this.changeDoc}
-                text={this.state.text}
-                addNote={this.addNote}
-                selected={this.state.expanded}
-                posColor={posColor}
-                showDocInput = {this.showDocInput}
-                changeDoc = {this.changeDoc}
-                toggleFilters = {this.toggleFilters}
-                showFilters = {this.state.showFilters}
-              />
-            </Grid>
-            <Grid item xs={4}>
-                {this.state.tutorial ? 
-                <Slide timeout={{ enter: 80, exit: 150}} direction="left" in={true} mountOnEnter unmountOnExit>
-                <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
-                  <ExpansionPanelSummary style={{cursor: 'auto'}}>
-                    <Typography component="h5" variant="title">Add your first document!</Typography>
-                    {/* <Typography color="textSecondary">{'(Part of Speach)' + this.state.addNote.tag}</Typography> */}
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <Typography component="p">
-                      Note taker is designed to help you not repeat yourself when notetaking and easily remember things!
                     </Typography>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel> 
-                </Slide>
-                :
-                <Slide timeout={{ enter: 80, exit: 150}} direction="left" in={this.state.addNote} mountOnEnter unmountOnExit>
+                    <Typography gutterBottom={true} align="left" variant="title" paragraph={true}>
+                      <TextField
+                        InputProps={{disableUnderline: true}}
+                        label="Document Body"
+                        fullWidth={true}
+                        id="text-field-controlled"
+                        name="docInpt"
+                        multiline
+                        rows={15}
+                        rowsMax={15}
+                        value={this.state.docInpt}
+                        onChange={(e)=>this.handleChange(e)}
+                      />
+                    </Typography>
+                    {!this.state.tutorial && <Button style={{width: '49%'}} onClick={this.showDocInput} variant="raised" color="secondary">Cancel</Button>}
+                    <Button style={this.state.tutorial ? {width: '100%'} : {width: '49%', float: 'right'}} disabled={this.state.docInpt === '' || this.state.nameInpt === ''} onClick={this.addDocument} variant="raised" color="primary">Add</Button>
+                    {this.state.loading && <LinearProgress style={{margin: '10px 0 10px 0'}} />}
+                  </Paper>
+                </div>
+              </Slide>
+                <DocumentBody 
+                  id="docBody"
+                  username={this.state.username}
+                  docList={this.state.docList}
+                  docName={this.state.docName}
+                  handleChange={this.changeDoc}
+                  text={this.state.text}
+                  addNote={this.addNote}
+                  selected={this.state.expanded}
+                  posColor={posColor}
+                  showDocInput = {this.showDocInput}
+                  changeDoc = {this.changeDoc}
+                  toggleFilters = {this.toggleFilters}
+                  showFilters = {this.state.showFilters}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                  {this.state.tutorial ? 
+                  <Slide timeout={{ enter: 80, exit: 150}} direction="left" in={true} mountOnEnter unmountOnExit>
                   <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
-                    <ExpansionPanelSummary 
-                      expandIcon={<Close onClick={()=> this.setState({addNote: false, newNote:'', badNoteAttempt: false})}/>}
-                      style={{cursor: 'auto'}}
-                    >
-                      <Typography component="h5" variant="title">{this.state.addNote.word}</Typography>
+                    <ExpansionPanelSummary style={{cursor: 'auto'}}>
+                      <Typography component="h5" variant="title">Add your first document!</Typography>
                       {/* <Typography color="textSecondary">{'(Part of Speach)' + this.state.addNote.tag}</Typography> */}
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                    <TextField
-                      autoFocus={true}
-                      fullWidth={true}
-                      helperText={this.state.badNoteAttempt && this.state.newNote === '' ? 'Note must not be empty' : ' '}
-                      id="multiline-static"
-                      multiline
-                      inputRef={(input) => this.noteInput = input}
-                      rowsMax="50"
-                      value={this.state.newNote}
-                      name="newNote"
-                      onChange={(e)=>this.handleChange(e)}
-                      margin="normal"
-                    />
+                      <Typography component="p">
+                        Note taker is designed to help you not repeat yourself when notetaking and easily remember things!
+                      </Typography>
+                      <List>
+                        
+                      </List>
                     </ExpansionPanelDetails>
-                    <Button onClick={this.postNote} fullWidth={true} variant="raised" color="primary">Add</Button>
                   </ExpansionPanel> 
-                  </Slide>}
-                <GridList 
-                  style={{
-                    height: this.state.addNote ? ((this.state.docBodyHeight) - 220) : (this.state.docBodyHeight)}} 
-                  cols={1} 
-                  component="div"
-                  ref={(list) => this.notesList = list}
-                  cellHeight={(this.state.docBodyHeight)}>
-                <div>
-                 <div style={{margin: '0 0 0 0', padding: '0 0 0 0'}} ref={(top) => this._top = top}></div>
-                  {this.state.notes.map((note, i) => {
-                    return (
-                      <div key={i} style={this.state.expanded === note.word ? {margin: '12px 0 12px 0'} : {margin: '1px 0 1px 0'}} ref={(word) => this[note.word] = word}>
-                      <ExpansionPanel
-                          expanded={this.state.expanded === note.word} 
-                          elevation={this.state.expanded === note.word ? 4 : 1}
-                          onChange={(e)=>  this.changePannel((this.state.expanded === note.word), note.word)}
-                          style={{marginRight: '30px'}}
-                        >
-                          <ExpansionPanelSummary 
-                           expandIcon={<ExpandMore />}>
-                            <PosIcon style={{color: posColor[note.tag] || '#4258d1'}}/>
-                            <Typography component="h5" variant="title">{note.word}</Typography>
-                          </ExpansionPanelSummary>
-                          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-                            <PosIcon style={{color: posColor[note.tag] || '#4258d1', margin: '3px 10px 0 2px'}}/>
-                            <Typography component="h3" variant="title" style={{fontSize:"24px"}} >{note.word}</Typography>
-                          </ExpansionPanelSummary>
-                          <ExpansionPanelDetails>
-                            {this.state.editNote === note.word ? 
-                            <Input
-                              type={'text'}
-                              autoFocus={true}
-                              fullWidth={true}
-                              id="multiline-static"
-                              multiline
-                              rowsMax="50"
-                              name="editNoteInpt"
-                              value={this.state.editNoteInpt}
-                              onChange={(e)=>this.handleChange(e)}
-                              margin="normal"
-                              style={{marginLeft: '10px'}}
-                              endAdornment={
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={()=>this.setState({editNoteInpt: '', editNote: false})}
-                                >
-                                  <Close />
-                                </IconButton>
-                                {(this.state.editNoteInpt !== note.note) && 
-                                <IconButton
-                                  onClick={()=>this.editNote({word: note.word, tag: note.tag})}
-                                >
-                                  <Send />
-                                </IconButton>}
-                              </InputAdornment>
+                  </Slide>
+                  :
+                  <Slide timeout={{ enter: 80, exit: 150}} direction="left" in={this.state.addNote} mountOnEnter unmountOnExit>
+                    <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
+                      <ExpansionPanelSummary 
+                        expandIcon={<Close onClick={()=> this.setState({addNote: false, newNote:'', badNoteAttempt: false})}/>}
+                        style={{cursor: 'auto'}}
+                      >
+                        <Typography component="h5" variant="title">{this.state.addNote.word}</Typography>
+                        {/* <Typography color="textSecondary">{'(Part of Speach)' + this.state.addNote.tag}</Typography> */}
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                      <TextField
+                        autoFocus={true}
+                        fullWidth={true}
+                        helperText={this.state.badNoteAttempt && this.state.newNote === '' ? 'Note must not be empty' : ' '}
+                        id="multiline-static"
+                        multiline
+                        inputRef={(input) => this.noteInput = input}
+                        rowsMax="50"
+                        value={this.state.newNote}
+                        name="newNote"
+                        onChange={(e)=>this.handleChange(e)}
+                        margin="normal"
+                      />
+                      </ExpansionPanelDetails>
+                      <Button onClick={this.postNote} fullWidth={true} variant="raised" color="primary">Add</Button>
+                    </ExpansionPanel> 
+                    </Slide>}
+                  <GridList 
+                    style={{
+                      height: this.state.addNote ? ((this.state.docBodyHeight) - 220) : (this.state.docBodyHeight)}} 
+                    cols={1} 
+                    component="div"
+                    ref={(list) => this.notesList = list}
+                    cellHeight={(this.state.docBodyHeight)}>
+                  <div>
+                   <div style={{margin: '0 0 0 0', padding: '0 0 0 0'}} ref={(top) => this._top = top}></div>
+                    {this.state.notes.map((note, i) => {
+                      return (
+                        <div key={i} style={this.state.expanded === note.word ? {margin: '12px 0 12px 0'} : {margin: '1px 0 1px 0'}} ref={(word) => this[note.word] = word}>
+                        <ExpansionPanel
+                            expanded={this.state.expanded === note.word} 
+                            elevation={this.state.expanded === note.word ? 4 : 1}
+                            onChange={(e)=>  this.changePannel((this.state.expanded === note.word), note.word)}
+                            style={{marginRight: '30px'}}
+                          >
+                            <ExpansionPanelSummary 
+                             expandIcon={<ExpandMore />}>
+                              <PosIcon style={{color: posColor[note.tag] || '#4258d1'}}/>
+                              <Typography component="h5" variant="title">{note.word}</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+                              <PosIcon style={{color: posColor[note.tag] || '#4258d1', margin: '3px 10px 0 2px'}}/>
+                              <Typography component="h3" variant="title" style={{fontSize:"24px"}} >{note.word}</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                              {this.state.editNote === note.word ? 
+                              <Input
+                                type={'text'}
+                                autoFocus={true}
+                                fullWidth={true}
+                                id="multiline-static"
+                                multiline
+                                rowsMax="50"
+                                name="editNoteInpt"
+                                value={this.state.editNoteInpt}
+                                onChange={(e)=>this.handleChange(e)}
+                                margin="normal"
+                                style={{marginLeft: '10px'}}
+                                endAdornment={
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={()=>this.setState({editNoteInpt: '', editNote: false})}
+                                  >
+                                    <Close />
+                                  </IconButton>
+                                  {(this.state.editNoteInpt !== note.note) && 
+                                  <IconButton
+                                    onClick={()=>this.editNote({word: note.word, tag: note.tag})}
+                                  >
+                                    <Send />
+                                  </IconButton>}
+                                </InputAdornment>
+                                }
+                              />
+                              :
+                              <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top">
+                                <Typography 
+                                  paragraph={true} 
+                                  variant="subheading" 
+                                  style={{ lineHeight: 'normal', whiteSpace: 'pre-line' ,margin: '3px 0 0 10px'}} 
+                                  onDoubleClick={()=> {
+                                    console.log(JSON.stringify(note.note))
+                                    this.setState({editNote: note.word, editNoteInpt: note.note})}
+                                  }>
+                                    {note.note}
+                                </Typography>
+                              </Tooltip>
                               }
-                            />
-                            :
-                            <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top">
-                              <Typography 
-                                paragraph={true} 
-                                variant="subheading" 
-                                style={{ lineHeight: 'normal', whiteSpace: 'pre-line' ,margin: '3px 0 0 10px'}} 
-                                onDoubleClick={()=> {
-                                  console.log(JSON.stringify(note.note))
-                                  this.setState({editNote: note.word, editNoteInpt: note.note})}
-                                }>
-                                  {note.note}
-                              </Typography>
-                            </Tooltip>
-                            }
-                            {/* <Typography variant="caption">
-                              This is where stats would go
-                            </Typography> */}
-                          </ExpansionPanelDetails>
-                        </ExpansionPanel>
-                        </div>
-                    )
-                  })}
-                  <div style={{height: '20px'}}></div>
-                </div>
-                </GridList>
+                              {/* <Typography variant="caption">
+                                This is where stats would go
+                              </Typography> */}
+                            </ExpansionPanelDetails>
+                          </ExpansionPanel>
+                          </div>
+                      )
+                    })}
+                    <div style={{height: '20px'}}></div>
+                  </div>
+                  </GridList>
+              </Grid>
             </Grid>
-          </Grid>
-      </div>
-     )
+        </div>
+       )
+    }
   }
 }
  

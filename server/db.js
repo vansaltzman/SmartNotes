@@ -27,28 +27,24 @@ function addDocument(username, docName, docBody) {
   return session
   
   .run(
-    `MATCH (u:User{name: '${username}'})
+    `MERGE (u:User{name: '${username}'})
     WITH u
     MERGE (u) -[:OWNS]-> (d:Document{name: '${docName}'})
     WITH ${JSON.stringify(docBody)} AS text, d, u
     UNWIND range(0,size(text)-2) AS i
     MERGE (w1:Word {name: text[i][0], pos:text[i][1]})
     MERGE (w2:Word {name: text[i+1][0], pos:text[i+1][1]})
-    MERGE (w1)-[:NEXT{doc: d.name, position: i+1}]->(w2)
-    WITH  text, d
+    MERGE (w1)-[:NEXT{doc: d.name, position: i+1, user: u.name}]->(w2)
+    WITH  text, d, u
     MATCH (w:Word {name: text[0][0], pos: text[0][1]})
-    WITH text, d, w
-    MERGE (d)-[:NEXT{doc: d.name, position: 0}]->(w)`
+    WITH text, d, w, u
+    MERGE (d)-[:NEXT{doc: d.name, position: 0, user: u.name}]->(w)`
   )
   .then(result => {
     session.close();
     console.log('add Document')
     return result
   })
-  .catch(err => {
-    session.close();
-    console.log(err)
-  });
 } 
 
 function getDocument(username, docName) {
@@ -57,7 +53,7 @@ function getDocument(username, docName) {
   return session
   
   .run(
-    `MATCH ()-[r:NEXT{doc:'${docName}'}]->(w:Word)
+    `MATCH ()-[r:NEXT{doc:'${docName}', user: '${username}'}]->(w:Word)
     RETURN w.name, w.pos, r.position ORDER BY r.position`
   )
   .then(result => {
@@ -72,12 +68,11 @@ function getDocument(username, docName) {
 } 
 
 function getDocumentList(username) {
-  //Not currently using username
   var session = driver.session()
   return session
   
   .run(
-  `MATCH (u:User{name: 'Riley'})-[:OWNS]->(d:Document)
+  `MATCH (u:User{name: '${username}'})-[:OWNS]->(d:Document)
   RETURN d.name`
   )
   .then(result => {

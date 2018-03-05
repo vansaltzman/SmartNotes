@@ -25,6 +25,7 @@ app.post('/document', (req, res) => {
 
   db.addDocument(username, docName, arr)
     .then(results => res.send(results))
+    .catch(err => res.status(500).send())
 })
 
 app.get('/document', (req, res) => {

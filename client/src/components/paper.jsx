@@ -45,7 +45,7 @@ function DocumentBody(props) {
     toggleFilters, 
   } = props;
 
-  if (docList.length > 0) {
+  if (docName && docList && docList.length > 0) {
     return ( 
       <div id='docBody'>
         <Paper className="paper" style={{marginBottom: '24px'}}>

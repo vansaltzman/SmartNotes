@@ -43,5 +43,39 @@
 //      )
 //   }
 // }
+
+
+<Paper style={{width: '60%'}} className="paper">
+            <Grid container direction="column" spacing={24} justify="center" alignItems="center" style={{maxWidth: '100%' , marginTop: '16px'}}>
+              <Grid item xs={10}>
+              <Typography align="center" variant="title" style={{marginBottom: '20px', fontSize: '42px'}}>
+                Welcome! Please Login
+              </Typography>
+              </Grid>
+              <Grid item xs={10}>
+              <Input
+                type={'text'}
+                autoFocus={true}
+                name="loginInpt"
+                value={this.state.loginInpt}
+                onChange={(e)=>this.handleChange(e)}
+                margin="normal"
+                endAdornment={
+                <InputAdornment position="end">
+                 { this.state.loginInpt.length > 3 ?
+                 <IconButton
+                    onClick={()=>this.handleUser(this.state.loginInpt)}
+                  >
+                    <PersonAdd />
+                  </IconButton>
+                  : <span style={{width: '48px'}}></span>
+                }
+                </InputAdornment>
+                }
+              />
+              {this.state.loginInpt.length < 4 && <FormHelperText>Username must be at least 4 characters</FormHelperText>}
+              </Grid>
+            </Grid>
+          </Paper>
  
 // export default DocsMenu;
