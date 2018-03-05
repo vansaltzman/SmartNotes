@@ -11,7 +11,7 @@ import Grid from 'material-ui/Grid'
 import Toolbar from 'material-ui/Toolbar'
 import { withStyles } from 'material-ui/styles';
 import ExpansionPanel, {ExpansionPanelDetails,ExpansionPanelSummary} from 'material-ui/ExpansionPanel';
-import { PersonAdd, Close, ExpandMore, Send, Edit } from 'material-ui-icons';
+import { ContentCopy, PersonAdd, Close, ExpandMore, Send, Edit } from 'material-ui-icons';
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import DocumentBody from './components/paper.jsx'
@@ -24,7 +24,10 @@ import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
 import IconButton from 'material-ui/IconButton'
 import { LinearProgress } from 'material-ui/Progress'
 import { FormHelperText } from 'material-ui/Form';
-import List, { ListItem, ListItemSecondaryAction, ListItemIcon } from 'material-ui/List'
+import List, { ListItem, ListItemSecondaryAction, ListItemIcon, ListItemText } from 'material-ui/List'
+import examples from './examples.js'
+import StatsList from './components/statsList.jsx'
+import { Stats } from 'fs';
 
 const posColor = {
   CC: '#adaaaa',
@@ -88,6 +91,7 @@ class App extends React.Component {
      this.showDocInput = this.showDocInput.bind(this)
      this.toggleFilters = this.toggleFilters.bind(this)
      this.handleUser = this.handleUser.bind(this)
+     this.getWordCount = this.getWordCount.bind(this)
   }
 
   componentDidMount() {
@@ -98,7 +102,6 @@ class App extends React.Component {
         .then(()=> {
           if (this.state.docList.length < 1) this.setState({showDocInput: true, tutorial: true})
           else this.setState({docBodyHeight: document.getElementById('docBody').offsetHeight})
-          console.log(this.state.showDocInput, '<<<<')
         })
     }
   }
@@ -277,6 +280,13 @@ class App extends React.Component {
     })
   }
 
+  getWordCount (username, docName, word) {
+   return axios.get('/wordCount', {params: {username, docName, word}})
+      .then((result)=> {
+        return result.data.count
+      })
+  }
+
   render() {
     
     const styles = {
@@ -319,6 +329,9 @@ class App extends React.Component {
                 name="loginInpt"
                 value={this.state.loginInpt}
                 onChange={(e)=>this.handleChange(e)}
+                onKeyDown={(e)=> {
+                  if (e.key === 'Enter') this.handleUser(this.state.loginInpt)
+                }}
                 margin="normal"
                 endAdornment={
                 <InputAdornment position="end">
@@ -405,24 +418,73 @@ class App extends React.Component {
               </Grid>
               <Grid item xs={4}>
                   {this.state.tutorial ? 
-                  <Slide timeout={{ enter: 80, exit: 150}} direction="left" in={true} mountOnEnter unmountOnExit>
-                  <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
+
+                // Tutorial //
+
+                  <Slide timeout={{ enter: 200, exit: 150}} direction="left" in={true} mountOnEnter unmountOnExit>
+                  <ExpansionPanel style={{marginRight: '30px', minHeight: '444px'}} expanded={true} >
                     <ExpansionPanelSummary style={{cursor: 'auto'}}>
-                      <Typography component="h5" variant="title">Add your first document!</Typography>
+                      <Typography component="h5" variant="title" style={{fontSize: '30px'}}>Add your first document!</Typography>
                       {/* <Typography color="textSecondary">{'(Part of Speach)' + this.state.addNote.tag}</Typography> */}
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                      <Typography component="p">
-                        Note taker is designed to help you not repeat yourself when notetaking and easily remember things!
+                      <Grid container>
+                      <Typography component="p" style={{margin: '0 20px 25px 20px'}}>
+                        NoteTaker is designed to help you take notes on novels, scripts, textbooks, etc. 
+                        Unlike traditional notes each word is bound to a single note that you can update with new 
+                        insights as you read along in your text. Have fun!
                       </Typography>
-                      <List>
-                        
+                      <Divider style={{width: '100%', margin: '10px 0 30px 0'}} />
+                      <Grid item xs={12}>
+                      <Typography component="h2" variant="subheading">Can't think of anything? Try one of these examples</Typography>
+                      <List style={{display: 'block'}} fullWidth={true} >
+                        <ListItem
+                          role={undefined}
+                        >
+                          <ListItemText primary="Moby Dick" />
+                          <ListItemSecondaryAction>
+                            <IconButton onClick={()=> this.setState({nameInpt: 'Moby Dick', docInpt: examples.mobyDick})}>
+                            <Tooltip title="Copy example" placement="left">
+                              <ContentCopy />
+                            </Tooltip>
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                        <ListItem
+                          role={undefined}
+                        >
+                          <ListItemText primary="Jane Eyre" />
+                          <ListItemSecondaryAction>
+                            <IconButton onClick={()=> this.setState({nameInpt: 'Jane Eyre', docInpt: examples.janeEyre})}>
+                              <Tooltip title="Copy example" placement="left">
+                                <ContentCopy />
+                              </Tooltip>
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                        <ListItem
+                          role={undefined}
+                        >
+                          <ListItemText primary="The Scarlet Letter" />
+                          <ListItemSecondaryAction>
+                            <IconButton onClick={()=> this.setState({nameInpt: 'The Scarlet Letter', docInpt: examples.scarletLetter})}>
+                              <Tooltip title="Copy example" placement="left">
+                                <ContentCopy />
+                              </Tooltip>
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
                       </List>
+                      </Grid>
+                      </Grid>
                     </ExpansionPanelDetails>
                   </ExpansionPanel> 
                   </Slide>
                   :
-                  <Slide timeout={{ enter: 80, exit: 150}} direction="left" in={this.state.addNote} mountOnEnter unmountOnExit>
+
+                // NotesList //
+
+                  <Slide timeout={{ enter: 80, exit: 300}} direction="left" in={this.state.addNote} mountOnEnter unmountOnExit>
                     <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
                       <ExpansionPanelSummary 
                         expandIcon={<Close onClick={()=> this.setState({addNote: false, newNote:'', badNoteAttempt: false})}/>}
@@ -523,6 +585,7 @@ class App extends React.Component {
                               {/* <Typography variant="caption">
                                 This is where stats would go
                               </Typography> */}
+                              <StatsList username={this.state.username} docName={this.state.docName} word={note.word} getWordCount={this.getWordCount}/>
                             </ExpansionPanelDetails>
                           </ExpansionPanel>
                           </div>

@@ -35,15 +35,28 @@ const styles = {
   },
 };
 
-function DocumentBody(props) {
+class DocumentBody extends React.Component {
+  constructor(props) {
+    super(props);
+  }
 
+  componentDidMount(){
+    document.getElementById('docBody').addEventListener('mousedown', function (event) { //Prevents select text on doubleclick
+      if (event.detail > 1) {
+        event.preventDefault();
+      }
+    }, false);
+  }
+
+  render() { 
+  
   const { 
     classes, username, docList, 
     docName, handleChange, text, 
     addNote, selected, posColor, 
     showDocInput, changeDoc, showFilters,
     toggleFilters, 
-  } = props;
+  } = this.props;
 
   if (docName && docList && docList.length > 0) {
     return ( 
@@ -80,13 +93,13 @@ function DocumentBody(props) {
                   </ListItem>
 
               </Select>
-              <IconButton>
+              {/* <IconButton>
                 <Filter onClick={toggleFilters}/>
-              </IconButton>
+              </IconButton> */}
           </Typography>
-            <div style={{display: 'inline'}} >
+            {/* <div style={{display: 'inline'}} >
               <FilterBar showFilters={showFilters} filter={()=> console.log('tick')}/>
-            </div>
+            </div> */}
           </Paper>
   
           <Paper className="paper">
@@ -104,8 +117,8 @@ function DocumentBody(props) {
       )
   }
   else {
-    return <div></div>
+    return <div id="docBody"></div>
+  }
   }
 }
-
 export default withStyles(styles)(DocumentBody);

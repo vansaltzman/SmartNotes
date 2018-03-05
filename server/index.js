@@ -71,10 +71,11 @@ app.post('/user', (req, res) => {
  .then(result => res.send(result))
 })
 
-app.get('/user', (req, res) => {
-  //recieve username
-  //if user exists
-    //send back a list of documents (or empty array if none)
+app.get('/wordCount', (req, res)=> {
+  var {username, docName, word} = req.query
+
+  db.getWordCount(username, docName, word)
+    .then(result=> res.send({count: result.records[0]._fields[0].low}))
 })
 
 app.listen(8080, ()=> {

@@ -33,12 +33,14 @@ function addDocument(username, docName, docBody) {
     WITH ${JSON.stringify(docBody)} AS text, d, u
     UNWIND range(0,size(text)-2) AS i
     MERGE (w1:Word {name: text[i][0], pos:text[i][1]})
+      ON CREATE SET w1.count = 1 ON MATCH SET w1.count = w1.count + 1
     MERGE (w2:Word {name: text[i+1][0], pos:text[i+1][1]})
-    MERGE (w1)-[:NEXT{doc: d.name, position: i+1, user: u.name}]->(w2)
+      ON CREATE SET w2.count = 1 ON MATCH SET w2.count = w2.count + 1
+    MERGE (w1)-[r:NEXT{doc: d.name, position: i+1, user: u.name}]->(w2)
     WITH  text, d, u
     MATCH (w:Word {name: text[0][0], pos: text[0][1]})
     WITH text, d, w, u
-    MERGE (d)-[:NEXT{doc: d.name, position: 0, user: u.name}]->(w)`
+    MERGE (d)-[r:NEXT{doc: d.name, position: 0, user: u.name}]->(w)`
   )
   .then(result => {
     session.close();
@@ -151,6 +153,29 @@ function getNotes(username, docName) {
   });
 }
 
+function getWordCount(user, doc, word) {
+  let query = ''
+  if (user) query += `user: '${user}'`
+  if (doc) query += `, doc: '${doc}'`
+
+  console.log(query)
+  var session = driver.session()
+  return session
+
+  .run(
+
+  `MATCH (w:Word{name:'${word}'})<-[r:NEXT{${query}}]-()
+  RETURN count(r)`
+
+  )
+  .then(result => {
+    session.close();
+    console.log('get Wordcount')
+    return result
+  })
+}
+
+
 module.exports = {
   addUser,
   addDocument,
@@ -158,5 +183,6 @@ module.exports = {
   getDocumentList,
   addNote,
   deleteNote,
-  getNotes
+  getNotes,
+  getWordCount
 }
