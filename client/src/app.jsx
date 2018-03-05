@@ -569,23 +569,23 @@ class App extends React.Component {
                                 }
                               />
                               :
-                              <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top">
-                                <Typography 
-                                  paragraph={true} 
-                                  variant="subheading" 
-                                  style={{ lineHeight: 'normal', whiteSpace: 'pre-line' ,margin: '3px 0 0 10px'}} 
-                                  onDoubleClick={()=> {
-                                    console.log(JSON.stringify(note.note))
-                                    this.setState({editNote: note.word, editNoteInpt: note.note})}
-                                  }>
-                                    {note.note}
-                                </Typography>
-                              </Tooltip>
+                                <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top">
+                                  <Typography 
+                                    paragraph={true} 
+                                    variant="subheading" 
+                                    style={{fontSize: '18px', lineHeight: 'normal', whiteSpace: 'pre-line' ,margin: '3px 0 0 10px'}} 
+                                    onDoubleClick={()=> {
+                                      console.log(JSON.stringify(note.note))
+                                      this.setState({editNote: note.word, editNoteInpt: note.note})}
+                                    }>
+                                      {note.note}
+                                  </Typography>
+                                </Tooltip>
                               }
                               {/* <Typography variant="caption">
                                 This is where stats would go
                               </Typography> */}
-                              <StatsList username={this.state.username} docName={this.state.docName} word={note.word} getWordCount={this.getWordCount}/>
+                                <StatsList expanded={this.state.expanded === note.word} username={this.state.username} docName={this.state.docName} word={note.word} getWordCount={this.getWordCount}/>
                             </ExpansionPanelDetails>
                           </ExpansionPanel>
                           </div>
