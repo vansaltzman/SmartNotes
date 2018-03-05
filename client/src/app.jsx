@@ -266,12 +266,12 @@ class App extends React.Component {
         .then((data) => {
             this.getDocument(docName)
             this.getDocumentList()
-            this.getNotes()
             this.setState({tutorial: false})
           })
           .then(()=> {
             this.showDocInput()
-            this.setState({loading: false})
+            this.getNotes()
+            this.setState({loading: false, nameInpt: '', docInpt: ''})
           })
           .catch(()=> {
             this.setState({loading: false})
