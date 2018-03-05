@@ -511,6 +511,26 @@ class App extends React.Component {
                       <Button onClick={this.postNote} fullWidth={true} variant="raised" color="primary">Add</Button>
                     </ExpansionPanel> 
                     </Slide>}
+
+                    
+
+                  {(this.state.docName !== '' && !this.state.tutorial && this.state.notes.length < 1 && !this.state.addNote ) &&
+                  
+                  //Note Tutorial
+
+                    <ExpansionPanel style={{marginRight: '30px'}} expanded={true} >
+                      <ExpansionPanelSummary style={{cursor: 'auto'}}>
+                        <Typography component="h5" variant="title" style={{fontSize: '30px'}}>Take some notes!</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <Typography component="p" style={{margin: '0 20px 25px 20px'}}>
+                          Click a word in your document to add a new note!
+                        </Typography>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+
+                  }
+
                   <GridList 
                     style={{
                       height: this.state.addNote ? ((this.state.docBodyHeight) - 220) : (this.state.docBodyHeight)}} 
