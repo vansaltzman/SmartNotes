@@ -3,7 +3,7 @@ import ListSubheader from 'material-ui/List/ListSubheader';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Collapse from 'material-ui/transitions/Collapse';
 import {InsertChart, ExpandLess, ExpandMore} from 'material-ui-icons';
-import { CircularProgress} from 'material-ui/Progress';
+import { CircularProgress } from 'material-ui/Progress';
 
 class StatsList extends React.Component {
   constructor(props) {
@@ -54,24 +54,24 @@ class StatsList extends React.Component {
 
   render() { 
     return (
-      <List style={{width: '100%'}}>
+      <List  style={{width: '100%'}}>
         <ListItem button onClick={()=> this.handleClick()}>
           <ListItemIcon>
             <InsertChart />
           </ListItemIcon>
-          <ListItemText divider primary="Statistics" />
+          <ListItemText primary="Statistics" />
           {this.state.open ? <ExpandLess /> : <ExpandMore />}
         </ListItem >
         <Collapse in={this.state.open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <ListItem >
-              {this.state.doc ? <ListItemText divider primary={"Document: " + this.state.doc}/> : <CircularProgress size={16} />}
+            <ListItem divider={true} >
+              {this.state.doc ? <ListItemText primary={"Document: " + this.state.doc}/> : <CircularProgress size={16} />}
             </ListItem>
-            <ListItem >
-            {this.state.user ? <ListItemText divider primary={"User: " + this.state.user}/> : <CircularProgress size={16} />}
+            <ListItem divider={true} >
+            {this.state.user ? <ListItemText primary={"User: " + this.state.user}/> : <CircularProgress size={16} />}
             </ListItem>
-            <ListItem >
-              {this.state.global ? <ListItemText divider primary={"Global: " + this.state.global}/> : <CircularProgress size={16} />}
+            <ListItem divider={true} >
+              {this.state.global ? <ListItemText primary={"Global: " + this.state.global}/> : <CircularProgress size={16} />}
             </ListItem>
           </List>
         </Collapse>

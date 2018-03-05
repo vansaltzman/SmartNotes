@@ -539,6 +539,8 @@ class App extends React.Component {
                               <Typography component="h3" variant="title" style={{fontSize:"24px"}} >{note.word}</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
+                            <Grid container spacing={16} style={{marginTop: '10px'}} >
+                            <Grid item xs={12} style={!this.state.editNote === note.word ? {paddingTop: '10px'} : {}}>
                               {this.state.editNote === note.word ? 
                               <Input
                                 type={'text'}
@@ -551,7 +553,7 @@ class App extends React.Component {
                                 value={this.state.editNoteInpt}
                                 onChange={(e)=>this.handleChange(e)}
                                 margin="normal"
-                                style={{marginLeft: '10px'}}
+                                style={{fontSize: '18px', marginLeft: '10px', paddingTop: '3px'}}
                                 endAdornment={
                                 <InputAdornment position="end">
                                   <IconButton
@@ -569,23 +571,27 @@ class App extends React.Component {
                                 }
                               />
                               :
-                                <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top">
-                                  <Typography 
-                                    paragraph={true} 
-                                    variant="subheading" 
-                                    style={{fontSize: '18px', lineHeight: 'normal', whiteSpace: 'pre-line' ,margin: '3px 0 0 10px'}} 
-                                    onDoubleClick={()=> {
-                                      console.log(JSON.stringify(note.note))
-                                      this.setState({editNote: note.word, editNoteInpt: note.note})}
-                                    }>
-                                      {note.note}
-                                  </Typography>
-                                </Tooltip>
+                              <Tooltip enterDelay={50} id="tooltip-right-start" title="Double-click to edit" placement="top-start">
+                              <Typography 
+                                paragraph={true} 
+                                variant="subheading" 
+                                style={{fontSize: '18px', lineHeight: 'normal', whiteSpace: 'pre-line', margin: '0 0 0 10px'}} 
+                                onDoubleClick={()=> {
+                                  console.log(JSON.stringify(note.note))
+                                  this.setState({editNote: note.word, editNoteInpt: note.note})}
+                                }>
+                                  {note.note}
+                              </Typography>
+                              </Tooltip>
                               }
+                              </Grid>
                               {/* <Typography variant="caption">
                                 This is where stats would go
                               </Typography> */}
-                                <StatsList expanded={this.state.expanded === note.word} username={this.state.username} docName={this.state.docName} word={note.word} getWordCount={this.getWordCount}/>
+                              <Grid item xs={12} style={{paddingTop: this.state.editNote === note.word ? '5px' : '30px'}} >
+                                <StatsList expanded={this.state.expanded === note.word} username={this.state.username} docName={this.state.docName} word={note.word} getWordCount={this.getWordCount} />
+                              </Grid>
+                              </Grid>
                             </ExpansionPanelDetails>
                           </ExpansionPanel>
                           </div>
