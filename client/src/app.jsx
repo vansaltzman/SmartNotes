@@ -514,7 +514,7 @@ class App extends React.Component {
 
                     
 
-                  {(this.state.docName !== '' && !this.state.tutorial && this.state.notes.length < 1 && !this.state.addNote ) &&
+                  {(this.state.docList.length > 0 && this.state.docName !== '' && !this.state.tutorial && this.state.notes.length < 1 && !this.state.addNote ) &&
                   
                   //Note Tutorial
 
