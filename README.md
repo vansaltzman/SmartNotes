@@ -13,16 +13,13 @@ Creating notes inside of a document (Click to see video)
 " target="_blank"><img src="https://img.youtube.com/vi/sYvRPyYlR3M/0.jpg" 
 alt="Note Taking" width="240" height="180" border="10" /></a>
 
-![Neo4j Graph](https://i.imgur.com/nJjnWYk.png)
-
-
 ## Table of Contents
 
 1. [Usage](#Usage)
 1. [Requirements](#requirements)
 1. [Development](#development)
     1. [Installing Dependencies](#installing-dependencies)
-    1. [Using Neo4j](#useful-queries)
+    1. [Using Neo4j](#neo4j)
     1. [Roadmap](#roadmap)
 1. [Team](#team)
 1. [Contributing](#contributing)
@@ -57,7 +54,18 @@ From within the root directory:
 npm install
 Create a new database in Neo4j
 ```
-### Useful Queries
+### Neo4j
+
+How data looks inside of the database
+
+![Neo4j Graph](https://i.imgur.com/nJjnWYk.png)
+
+- Users own documents
+- Documents point to their first word
+- Each word points to it's next word
+    - the NEXT relationship includes the User, Document and Position
+- Notes point from a user to a word (not shown)
+    - The NOTE relationship includes the note text, User, and Document
 
  Here are some useful queries for this project using the Cypher query language:
 
