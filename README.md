@@ -56,7 +56,9 @@ Create a new database in Neo4j
 ```
 ### Neo4j
 
-How data looks inside of the database
+How data looks inside of the database. 
+
+Note that each unique word has just one node that is shared within and across all documents. This pattern allows for NLP and analytics to be performed using Cypher and Neo4j. Right now only word count is being performed, but more in depth analysis could be performed to gain more nuanced insights such as longest common phrase, most frequent words following a given word, etc.  
 
 ![Neo4j Graph](https://i.imgur.com/nJjnWYk.png)
 
