@@ -38,7 +38,7 @@ npm run react-dev
 
 Navigate to localhost:8080 or the appropriate port. 
 
-See [useful queries](#Useful Queries) for ways to manipulate the database through the Neo4j client
+See [useful queries](#neo4j) for ways to manipulate the database through the Neo4j client
 
 ## Requirements
 
