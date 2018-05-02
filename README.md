@@ -1,5 +1,5 @@
 # SmartNotes
-Note taking application to help readers remember relevant information by having the identical words share a single note
+Note taking application to help readers remember relevant information by having identical words share a single note
 
 Adding a new document (Click to see video)
 
