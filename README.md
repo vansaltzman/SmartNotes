@@ -52,7 +52,7 @@ From within the root directory:
 
 ```sh
 npm install
-Create a new database in Neo4j
+Create a new project for your database using the Neo4j client
 ```
 ### Neo4j
 
