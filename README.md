@@ -3,13 +3,13 @@ Note taking application to help readers remember relevant information by having 
 
 Adding a new document (Click to see video)
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=https://youtu.be/GasnlmSD33c
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=GasnlmSD33c
 " target="_blank"><img src="https://img.youtube.com/vi/GasnlmSD33c/0.jpg" 
 alt="Document Creation" width="240" height="180" border="10" /></a>
 
 Creating notes inside of a document (Click to see video)
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=https://youtu.be/sYvRPyYlR3M
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=sYvRPyYlR3M
 " target="_blank"><img src="https://img.youtube.com/vi/sYvRPyYlR3M/0.jpg" 
 alt="Note Taking" width="240" height="180" border="10" /></a>
 
